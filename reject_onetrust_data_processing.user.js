@@ -20,7 +20,7 @@ async function main () {
 
     // await elementLoaded('ot-pc-content', () => findConsentManagementButton().click())
     findConsentManagementButton().click()
-    objectToAllUses(findPurposePanels())
+    objectToAllUses(findPurposeTabs())
     refuseAllVendors()
     findConfirmationButton().click()
   } catch (e) {
@@ -52,7 +52,7 @@ function elementLoaded (id, actionAfterObservationStart) {
       10000)
     observer.observe(
       document.querySelector('body'), { subtree: true, childList: true })
-    
+
     // TODO: check if element has been loaded. if so, clear, disconnect, resolve
 
     if (actionAfterObservationStart) {
@@ -71,12 +71,13 @@ function findConsentManagementButton () {
   return button
 }
 
-function objectToAllUses (panels) {
+function objectToAllUses (tabs) {
   let checkboxesFound = false
   let objectionButtonsFound = false
 
-  // TODO: forEach tab -> click, find ID tab[aria-controls] to get panel
-  panels.forEach(panel => {
+  tabs.forEach(tab => {
+    tab.click()
+    const panel = findPanelFor(tab)
     const title = findTitle(panel)
 
     const checkboxes = findCheckboxesIn(panel)
@@ -103,6 +104,11 @@ function objectToAllUses (panels) {
   }
 }
 
+function findPanelFor (tab) {
+  const panelId = tab.getAttribute('aria-controls')
+  return document.getElementById(panelId)
+}
+
 // TODO: find in tab easier?
 function findTitle (panel) {
   return panel.querySelector('.ot-cat-header')?.innerText
@@ -127,9 +133,17 @@ function logObjectionButtonCount (count, panelTitle) {
   console.debug(`Found ${count} objection button${suffix} in panel '${panelTitle}'.`)
 }
 
+function findPurposeTabs() {
+  const tabs = document.querySelectorAll('#ot-pc-content div.category-menu-switch-handler')
+  const amount = tabs?.length
+  if (!amount) {
+    throw new Error('Purpose tabs not found.')
+  }
 
-// TODO: findPurposeTabs
-// document.querySelectorAll('#ot-pc-content div.category-menu-switch-handler')
+  const suffix = amount > 1 ? 's' : ''
+  console.debug(`Found ${amount} purpose tab${suffix}.`)
+  return tabs
+}
 function findPurposePanels () {
   const panels = document.querySelectorAll('#ot-pc-content > div > div.ot-tab-desc > div.ot-desc-cntr')
   const amount = panels?.length
