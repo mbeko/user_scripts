@@ -76,9 +76,12 @@ function objectToAllUses (tabs) {
   let objectionButtonsFound = false
 
   tabs.forEach(tab => {
+    // The panels are accessible without clicking, but without doing it,
+    // the OneTrust JavaScript throws an error about a missing parent
+    // when trying to click on the objection buttons.
     tab.click()
     const panel = findPanelFor(tab)
-    const title = findTitle(panel)
+    const title = findTitle(tab)
 
     const checkboxes = findCheckboxesIn(panel)
     if (checkboxes?.length) {
@@ -109,9 +112,8 @@ function findPanelFor (tab) {
   return document.getElementById(panelId)
 }
 
-// TODO: find in tab easier?
-function findTitle (panel) {
-  return panel.querySelector('.ot-cat-header')?.innerText
+function findTitle (tab) {
+  return tab.querySelector('h3')?.innerText
 }
 
 function findCheckboxesIn (panel) {
@@ -143,17 +145,6 @@ function findPurposeTabs() {
   const suffix = amount > 1 ? 's' : ''
   console.debug(`Found ${amount} purpose tab${suffix}.`)
   return tabs
-}
-function findPurposePanels () {
-  const panels = document.querySelectorAll('#ot-pc-content > div > div.ot-tab-desc > div.ot-desc-cntr')
-  const amount = panels?.length
-  if (!amount) {
-    throw new Error('Purpose panels not found.')
-  }
-
-  const suffix = amount > 1 ? 's' : ''
-  console.debug(`Found ${amount} purpose panel${suffix}.`)
-  return panels
 }
 
 function refuseAllVendors () {
