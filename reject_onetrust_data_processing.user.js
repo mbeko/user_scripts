@@ -149,7 +149,10 @@ function findPurposeTabs() {
 
 function refuseAllVendors () {
   findVendorsListButton().click()
-  uncheck(findAllVendorsConsentCheckbox())
+  
+  const checkboxes = findAllVendorsConsentCheckboxes()
+  checkboxes.forEach(uncheck)
+
   findBackToPanelButton().click()
 }
 
@@ -170,14 +173,16 @@ function uncheck (checkbox) {
   }
 }
 
-function findAllVendorsConsentCheckbox () {
-  const checkbox = document.getElementById('select-all-vendor-groups-handler')
-  if (!checkbox) {
-    throw new Error('All IAB vendors consent checkbox not found.')
+function findAllVendorsConsentCheckboxes () {
+  const checkboxes = document.querySelectorAll('input[aria-label*="all vendors" i]')
+  const amount = checkboxes?.length
+  if (!amount) {
+    throw new Error('No checkbox for all vendors consent found.')
   }
 
-  console.debug('Found consent checkbox for all IAB vendors.')
-  return checkbox
+  const suffix = amount > 1 ? 'es' : ''
+  console.debug(`Found ${amount} all vendors consent checkbox${suffix}.`)
+  return checkboxes
 }
 
 function findBackToPanelButton () {
