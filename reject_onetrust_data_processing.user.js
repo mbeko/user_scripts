@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Object to OneTrust personal data processing
 // @match       http*://*macmillandictionary.com/*
-// @version     1.0.0
+// @version     2.0.0
 // @run-at      document-idle
 // @description Automates the objection to personal data processing in the dialogues of the [OneTrust Preference Center](https://www.onetrust.com/products/cookie-consent). It toggles off all cookie options, objects to all legitimate interests and removes consent for all vendors.
 // ==/UserScript==
