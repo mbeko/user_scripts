@@ -92,6 +92,18 @@ function findConsentManagementButton () {
   return button
 }
 
+function findPurposeTabs() {
+  const tabs = document.querySelectorAll('#ot-pc-content div.category-menu-switch-handler')
+  const amount = tabs?.length
+  if (!amount) {
+    throw new Error('Purpose tabs not found.')
+  }
+
+  const suffix = amount > 1 ? 's' : ''
+  console.debug(`Found ${amount} purpose tab${suffix}.`)
+  return tabs
+}
+
 function objectToAllUses (tabs) {
   let checkboxesFound = false
   let objectionButtonsFound = false
@@ -156,21 +168,9 @@ function logObjectionButtonCount (count, panelTitle) {
   console.debug(`Found ${count} objection button${suffix} in panel '${panelTitle}'.`)
 }
 
-function findPurposeTabs() {
-  const tabs = document.querySelectorAll('#ot-pc-content div.category-menu-switch-handler')
-  const amount = tabs?.length
-  if (!amount) {
-    throw new Error('Purpose tabs not found.')
-  }
-
-  const suffix = amount > 1 ? 's' : ''
-  console.debug(`Found ${amount} purpose tab${suffix}.`)
-  return tabs
-}
-
 function refuseAllVendors () {
   findVendorsListButton().click()
-  
+
   const checkboxes = findAllVendorsConsentCheckboxes()
   checkboxes.forEach(uncheck)
 
