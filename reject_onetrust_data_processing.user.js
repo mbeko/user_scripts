@@ -11,15 +11,12 @@ main()
 
 async function main () {
   try {
-    const elementsLoaded = await Promise.all(
-      ['onetrust-banner-sdk', 'onetrust-consent-sdk'].map(id => elementLoaded(id)))
-    if (elementsLoaded.includes(false)) {
-      console.debug('not loaded')
+    if (!await cookieBannerLoaded()) {
+      console.debug('The cookie banner has not been found.')
       return
     }
 
-    // await elementLoaded('ot-pc-content', () => findConsentManagementButton().click())
-    findConsentManagementButton().click()
+    await consentDialogueLoadedAfterOpening()
     objectToAllUses(findPurposeTabs())
     refuseAllVendors()
     findConfirmationButton().click()
@@ -29,17 +26,23 @@ async function main () {
   }
 }
 
+async function cookieBannerLoaded () {
+  const elementsLoaded = await Promise.all(
+      ['onetrust-banner-sdk', 'onetrust-consent-sdk'].map(id => elementLoaded(id)))
+  return elementsLoaded.every(i => i)
+}
+
+function consentDialogueLoadedAfterOpening () {
+  return elementLoaded('ot-pc-content', () => findConsentManagementButton().click())
+}
+
 function elementLoaded (id, actionAfterObservationStart) {
   return new Promise((resolve, reject) => {
     const observer = new window.MutationObserver(mutations => {
-      const banner = mutations
-        .flatMap(mutation => Array.from(mutation.addedNodes))
-        .filter(node => node.nodeType === window.Node.ELEMENT_NODE)
-        .find(node => node.attributes.id?.value === id)
-
-      if (!banner) {
+      if (!findAddedNodeIn(mutations, id)) {
         return
       }
+
       clearTimeout(disconnectionTimer)
       observer.disconnect()
       resolve(true)
@@ -50,8 +53,7 @@ function elementLoaded (id, actionAfterObservationStart) {
         resolve(false)
       },
       10000)
-    observer.observe(
-      document.querySelector('body'), { subtree: true, childList: true })
+    observeAllPageElements(observer)
 
     // TODO: check if element has been loaded. if so, clear, disconnect, resolve
 
@@ -59,6 +61,18 @@ function elementLoaded (id, actionAfterObservationStart) {
       actionAfterObservationStart()
     }
   })
+}
+
+function findAddedNodeIn (pageElementMutations, nodeId) {
+  return pageElementMutations
+    .flatMap(mutation => Array.from(mutation.addedNodes))
+    .filter(node => node.nodeType === window.Node.ELEMENT_NODE)
+    .find(node => node.attributes.id?.value === nodeId)
+}
+
+function observeAllPageElements (observer) {
+  observer.observe(
+    document.querySelector('body'), { subtree: true, childList: true })
 }
 
 function findConsentManagementButton () {
