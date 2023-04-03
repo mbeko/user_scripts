@@ -55,8 +55,11 @@ function elementLoaded (id, actionAfterObservationStart) {
       10000)
     observeAllPageElements(observer)
 
-    // TODO: check if element has been loaded. if so, clear, disconnect, resolve
-
+    if (wasAlreadyLoaded(id)) {
+      clearTimeout(disconnectionTimer)
+      observer.disconnect()
+      resolve(true)
+    }
     if (actionAfterObservationStart) {
       actionAfterObservationStart()
     }
@@ -73,6 +76,10 @@ function findAddedNodeIn (pageElementMutations, nodeId) {
 function observeAllPageElements (observer) {
   observer.observe(
     document.querySelector('body'), { subtree: true, childList: true })
+}
+
+function wasAlreadyLoaded (elementId) {
+  return document.getElementById(elementId)
 }
 
 function findConsentManagementButton () {
