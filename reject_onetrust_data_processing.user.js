@@ -1,6 +1,5 @@
 // ==UserScript==
 // @name        Object to OneTrust personal data processing
-// @match       http*://*leo.org/*
 // @match       http*://*macmillandictionary.com/*
 // @version     1.0.0
 // @run-at      document-idle
